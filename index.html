@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ミカドヤ 食べ物ガチャ</title>
+  <style>
+    /* ===== CSS 変数 ===== */
+    :root {
+      --bg:       #f6f0e4;
+      --red:      #c0392b;
+      --red-dark: #8c2820;
+      --ink:      #1a1a1a;
+      --brown:    #7a5230;
+      --green:    #5a7a3a;
+      --card:     #faf7f0;
+      --line:     #c8bfac;
+      --font-h:   "Yuji Syuku", "ヒラギノ明朝 ProN", "Hiragino Mincho ProN", Georgia, serif;
+      --font-b:   system-ui, -apple-system, "Hiragino Sans", "Meiryo", sans-serif;
+      --r:        6px;
+      --w:        480px;
+    }
+
+    /* ===== Reset ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-b);
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* ===== レイアウト ===== */
+    .header, .main, .footer {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .header-inner, .main-inner, .footer-inner {
+      width: 100%;
+      max-width: var(--w);
+    }
+
+    .main { flex: 1; }
+    .main-inner { padding: 24px 16px 32px; }
+
+    /* ===== ヘッダー（のれん風） ===== */
+    .header {
+      background: var(--red);
+      color: #fff;
+      position: relative;
+    }
+
+    .header-inner {
+      padding: 20px 16px 0;
+      text-align: center;
+    }
+
+    .header-kamon {
+      font-size: 1.2rem;
+      letter-spacing: 0.5em;
+      opacity: 0.85;
+      margin-bottom: 6px;
+    }
+
+    .header-title {
+      font-family: var(--font-h);
+      font-size: clamp(1.4rem, 5vw, 1.8rem);
+      letter-spacing: 0.12em;
+      line-height: 1.3;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .header-sub {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      margin-top: 6px;
+      letter-spacing: 0.06em;
+    }
+
+    /* のれん下部ストライプ */
+    .header-noren {
+      display: flex;
+      margin-top: 16px;
+      gap: 3px;
+      padding: 0 8px;
+      justify-content: center;
+    }
+
+    .noren-strip {
+      flex: 1;
+      max-width: 40px;
+      height: 28px;
+      background: rgba(0,0,0,0.18);
+      border-radius: 0 0 14px 14px;
+    }
+
+    /* ===== 予算セレクター ===== */
+    .budget-section { margin-bottom: 28px; }
+
+    .section-label {
+      display: block;
+      font-family: var(--font-h);
+      font-size: 0.9rem;
+      color: var(--brown);
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+
+    .segment {
+      display: flex;
+      border: 2px solid var(--ink);
+      border-radius: var(--r);
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .segment-btn {
+      flex: 1;
+      padding: 13px 8px;
+      font-family: var(--font-b);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      background: transparent;
+      border: none;
+      border-right: 1px solid var(--ink);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .segment-btn:last-child { border-right: none; }
+
+    .segment-btn[aria-checked="true"] {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .segment-btn:focus-visible {
+      outline: 3px solid var(--brown);
+      outline-offset: -3px;
+    }
+
+    /* ===== ガチャボタン ===== */
+    .gacha-section { margin-bottom: 28px; }
+
+    .gacha-btn {
+      display: block;
+      width: 85%;
+      min-height: 64px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: var(--r);
+      font-family: var(--font-h);
+      font-size: clamp(1.1rem, 4vw, 1.3rem);
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      box-shadow: 0 5px 0 var(--red-dark);
+      transition: transform 0.1s, box-shadow 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .gacha-btn:not(:disabled):active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 var(--red-dark);
+    }
+
+    .gacha-btn:disabled {
+      background: #b0a090;
+      box-shadow: 0 5px 0 #887060;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .gacha-btn:focus-visible {
+      outline: 3px solid var(--brown);
+      outline-offset: 3px;
+    }
+
+    .gacha-btn.is-spinning {
+      animation: karakara 0.4s ease-in-out;
+    }
+
+    @keyframes karakara {
+      0%   { transform: translateX(0)   rotate(0deg); }
+      20%  { transform: translateX(-7px) rotate(-2deg); }
+      40%  { transform: translateX(7px)  rotate(2deg); }
+      60%  { transform: translateX(-5px) rotate(-1deg); }
+      80%  { transform: translateX(5px)  rotate(1deg); }
+      100% { transform: translateX(0)   rotate(0deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .gacha-btn.is-spinning { animation: none; }
+    }
+
+    /* ===== 結果エリア ===== */
+    .result-section { margin-bottom: 8px; }
+    .result-section[hidden] { display: none; }
+
+    .result-summary {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .result-label {
+      font-family: var(--font-h);
+      font-size: 0.85rem;
+      color: var(--brown);
+      letter-spacing: 0.1em;
+    }
+
+    .result-total {
+      font-family: var(--font-h);
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--ink);
+    }
+
+    .result-remainder {
+      font-size: 0.9rem;
+      color: var(--brown);
+    }
+
+    .result-note {
+      font-size: 0.72rem;
+      color: #888;
+      margin-bottom: 18px;
+    }
+
+    .result-body { margin-bottom: 8px; }
+
+    .result-fade {
+      animation: fadein 0.4s ease;
+    }
+
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .result-fade { animation: none; }
+    }
+
+    /* カテゴリグループ */
+    .cat-group { margin-bottom: 18px; }
+
+    .cat-heading {
+      font-family: var(--font-h);
+      font-size: 0.85rem;
+      color: var(--brown);
+      letter-spacing: 0.12em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .cat-heading::before, .cat-heading::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--brown);
+    }
+
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 6px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .item-row:last-child { border-bottom: none; }
+
+    .item-name { font-size: 0.95rem; }
+
+    .item-price {
+      font-size: 0.95rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--red);
+      font-weight: 700;
+      white-space: nowrap;
+      margin-left: 16px;
+    }
+
+    /* エラー・空メッセージ */
+    .msg-box {
+      padding: 20px 16px;
+      border-radius: var(--r);
+      border: 1px solid var(--line);
+      background: #fff;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .msg-box.is-error {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    /* もう一回ボタン */
+    .reroll-btn {
+      display: block;
+      width: 85%;
+      min-height: 52px;
+      margin: 22px auto 0;
+      padding: 10px 16px;
+      background: #fff;
+      color: var(--red);
+      border: 2px solid var(--red);
+      border-radius: var(--r);
+      font-family: var(--font-h);
+      font-size: 1.05rem;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .reroll-btn:not(:disabled):hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .reroll-btn:focus-visible {
+      outline: 3px solid var(--brown);
+      outline-offset: 3px;
+    }
+
+    /* ===== 区切り線 ===== */
+    .sep {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 28px 0;
+    }
+
+    /* ===== 食べ物メニュー一覧（折りたたみ） ===== */
+    .menu-details {
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: var(--card);
+      overflow: hidden;
+    }
+
+    .menu-details > summary {
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      cursor: pointer;
+      font-family: var(--font-h);
+      font-size: 0.9rem;
+      color: var(--brown);
+      letter-spacing: 0.08em;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .menu-details > summary::-webkit-details-marker { display: none; }
+
+    .menu-details > summary::after {
+      content: '▸';
+      font-size: 0.8rem;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+
+    .menu-details[open] > summary::after {
+      transform: rotate(90deg);
+    }
+
+    .menu-details > summary:focus-visible {
+      outline: 2px solid var(--brown);
+      outline-offset: -2px;
+    }
+
+    .menu-list-body {
+      padding: 4px 16px 16px;
+    }
+
+    .menu-cat-section { margin-top: 14px; }
+
+    .menu-cat-label {
+      font-family: var(--font-h);
+      font-size: 0.8rem;
+      color: var(--green);
+      border-bottom: 1px solid var(--green);
+      padding-bottom: 2px;
+      margin-bottom: 6px;
+      letter-spacing: 0.1em;
+    }
+
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      font-size: 0.82rem;
+      border-bottom: 1px dotted var(--line);
+    }
+
+    .menu-item:last-child { border-bottom: none; }
+
+    .menu-item-price {
+      color: var(--red);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      margin-left: 8px;
+    }
+
+    /* ===== フッター ===== */
+    .footer {
+      background: var(--ink);
+      color: #c8bfac;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      padding: 16px;
+      font-size: 0.75rem;
+      line-height: 1.9;
+    }
+
+    /* ===== iPhone SE 対応確認 ===== */
+    @media (max-width: 375px) {
+      .main-inner { padding: 20px 12px 28px; }
+      .gacha-btn { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<header class="header">
+  <div class="header-inner">
+    <p class="header-kamon">🏮 ミカドヤ 🏮</p>
+    <h1 class="header-title">食べ物ガチャ</h1>
+    <p class="header-sub">予算内の食べ物の組み合わせをランダムに提案</p>
+    <div class="header-noren" aria-hidden="true">
+      <div class="noren-strip"></div>
+      <div class="noren-strip"></div>
+      <div class="noren-strip"></div>
+      <div class="noren-strip"></div>
+      <div class="noren-strip"></div>
+      <div class="noren-strip"></div>
+      <div class="noren-strip"></div>
+      <div class="noren-strip"></div>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="main-inner">
+
+    <!-- 予算セレクター -->
+    <section class="budget-section">
+      <span class="section-label">予算を選ぶ</span>
+      <div class="segment" role="radiogroup" aria-label="予算選択">
+        <button class="segment-btn"
+                role="radio"
+                aria-checked="true"
+                data-budget="2000">2,000円</button>
+        <button class="segment-btn"
+                role="radio"
+                aria-checked="false"
+                data-budget="3000">3,000円</button>
+      </div>
+    </section>
+
+    <!-- ガチャボタン -->
+    <section class="gacha-section">
+      <button class="gacha-btn"
+              id="gacha-btn"
+              aria-label="2000円ガチャを引く"
+              disabled>
+        2,000円ガチャを引く 🎲
+      </button>
+    </section>
+
+    <!-- 結果エリア -->
+    <section class="result-section"
+             id="result-section"
+             aria-live="polite"
+             aria-atomic="true"
+             hidden>
+    </section>
+
+    <hr class="sep">
+
+    <!-- 食べ物メニュー一覧（折りたたみ） -->
+    <details class="menu-details" id="menu-details">
+      <summary>食べ物メニュー一覧</summary>
+      <div class="menu-list-body" id="menu-list-body">
+        <p style="font-size:0.82rem;color:#888;padding-top:8px;">読み込み中…</p>
+      </div>
+    </details>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <p>※価格は税込。ドリンク・お通し（チャージ）代は別途。</p>
+    <p>本サービスはファンによる非公式サイトです。</p>
+  </div>
+</footer>
+
+<script>
+  'use strict';
+
+  // ===== 状態 =====
+  let menuData = null;
+  let budget = 2000;
+  let hasResult = false;
+  let isRunning = false;
+
+  // ===== DOM =====
+  const gachaBtn      = document.getElementById('gacha-btn');
+  const resultSection = document.getElementById('result-section');
+  const menuListBody  = document.getElementById('menu-list-body');
+  const segBtns       = document.querySelectorAll('.segment-btn');
+
+  // ===== ユーティリティ =====
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function yen(n) {
+    return n.toLocaleString('ja-JP') + '円';
+  }
+
+  // Fisher-Yates シャッフル
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  // ===== メニュー読み込み =====
+  async function loadMenu() {
+    const sources = ['./menu.json', './menu.sample.json'];
+    for (const src of sources) {
+      try {
+        const res = await fetch(src);
+        if (!res.ok) continue;
+        const data = await res.json();
+        if (data && Array.isArray(data.categories) && Array.isArray(data.items)) {
+          return data;
+        }
+      } catch (_) {
+        // 次のフォールバックへ
+      }
+    }
+    return null;
+  }
+
+  // ===== ガチャ対象プール構築（kind:"food" の category のみ） =====
+  function buildPool(data) {
+    const foodIds = new Set(
+      data.categories
+        .filter(c => c.kind === 'food')
+        .map(c => c.id)
+    );
+    return data.items.filter(item =>
+      item.available !== false && foodIds.has(item.category)
+    );
+  }
+
+  // ===== ガチャアルゴリズム（§6.2） =====
+  function generateOrder(pool, categories, bdg) {
+    if (!pool || pool.length === 0) {
+      return { items: [], total: 0, remainder: bdg, error: 'EMPTY' };
+    }
+
+    const fitting = pool.filter(i => i.price <= bdg);
+    if (fitting.length === 0) {
+      return { items: [], total: 0, remainder: bdg, error: 'OVER_BUDGET' };
+    }
+
+    // ステップ1: シャッフル後に貪欲追加
+    const selected = [];
+    const selSet   = new Set();
+    let total = 0;
+
+    for (const item of shuffle(pool)) {
+      if (total + item.price <= bdg) {
+        selected.push(item);
+        selSet.add(item.id);
+        total += item.price;
+      }
+
+      // 残額に収まる未採用品がなければ終了
+      let minRemain = Infinity;
+      for (const i of pool) {
+        if (!selSet.has(i.id) && i.price < minRemain) minRemain = i.price;
+      }
+      if (bdg - total < minRemain) break;
+    }
+
+    // ステップ2: 残額詰め込み（価格降順で貪欲）
+    for (;;) {
+      const rem = bdg - total;
+      let best = null;
+      for (const item of pool) {
+        if (!selSet.has(item.id) && item.price <= rem) {
+          if (!best || item.price > best.price) best = item;
+        }
+      }
+      if (!best) break;
+      selected.push(best);
+      selSet.add(best.id);
+      total += best.price;
+    }
+
+    // ステップ3: カテゴリ偏り緩和（1カテゴリ > 80%）
+    if (selected.length > 1) {
+      const counts = {};
+      for (const item of selected) {
+        counts[item.category] = (counts[item.category] || 0) + 1;
+      }
+      const maxCnt = Math.max(...Object.values(counts));
+      if (maxCnt / selected.length > 0.8) {
+        const overCat = Object.keys(counts).find(k => counts[k] === maxCnt);
+        // 偏ったカテゴリ内で最安品
+        const cheapestOver = selected
+          .filter(i => i.category === overCat)
+          .sort((a, b) => a.price - b.price)[0];
+        const spaceAfterSwap = bdg - total + cheapestOver.price;
+        // 別カテゴリで price <= spaceAfterSwap の中で最高価格
+        const replacement = pool
+          .filter(i => !selSet.has(i.id) && i.category !== overCat && i.price <= spaceAfterSwap)
+          .sort((a, b) => b.price - a.price)[0];
+        if (replacement) {
+          const newTotal = total - cheapestOver.price + replacement.price;
+          // total が下がらない場合のみ差し替え
+          if (newTotal <= bdg && newTotal >= total) {
+            const idx = selected.indexOf(cheapestOver);
+            selected.splice(idx, 1, replacement);
+            selSet.delete(cheapestOver.id);
+            selSet.add(replacement.id);
+            total = newTotal;
+          }
+        }
+      }
+    }
+
+    return {
+      items: selected,
+      total,
+      remainder: bdg - total,
+      fillRate: total / bdg
+    };
+  }
+
+  // ===== 結果レンダリング =====
+  function renderResult(result, categories) {
+    resultSection.removeAttribute('hidden');
+    resultSection.innerHTML = '';
+
+    if (result.error === 'EMPTY') {
+      resultSection.innerHTML =
+        '<div class="msg-box is-error">対象の食べ物メニューがありません。</div>';
+      appendRerollBtn();
+      return;
+    }
+
+    if (result.error === 'OVER_BUDGET') {
+      resultSection.innerHTML =
+        `<div class="msg-box is-error">${yen(budget)}に収まる食べ物の組み合わせがありません。</div>`;
+      appendRerollBtn();
+      return;
+    }
+
+    // サマリー（合計・残額）
+    const summary = document.createElement('div');
+    summary.className = 'result-summary result-fade';
+    summary.innerHTML =
+      `<span class="result-label">ガチャ結果</span>` +
+      `<span class="result-total">合計 ${esc(yen(result.total))}</span>` +
+      `<span class="result-remainder">残り ${esc(yen(result.remainder))}</span>`;
+    resultSection.appendChild(summary);
+
+    const note = document.createElement('p');
+    note.className = 'result-note';
+    note.textContent = '※ドリンク・お通し代別';
+    resultSection.appendChild(note);
+
+    // カテゴリ別グルーピング（order 順）
+    const foodCats = categories
+      .filter(c => c.kind === 'food')
+      .sort((a, b) => a.order - b.order);
+
+    const grouped = {};
+    for (const item of result.items) {
+      (grouped[item.category] = grouped[item.category] || []).push(item);
+    }
+
+    const body = document.createElement('div');
+    body.className = 'result-body result-fade';
+
+    for (const cat of foodCats) {
+      if (!grouped[cat.id] || grouped[cat.id].length === 0) continue;
+
+      const group = document.createElement('div');
+      group.className = 'cat-group';
+
+      const heading = document.createElement('h2');
+      heading.className = 'cat-heading';
+      heading.textContent = cat.label;
+      group.appendChild(heading);
+
+      for (const item of grouped[cat.id]) {
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML =
+          `<span class="item-name">${esc(item.name)}</span>` +
+          `<span class="item-price">${esc(yen(item.price))}</span>`;
+        group.appendChild(row);
+      }
+      body.appendChild(group);
+    }
+
+    resultSection.appendChild(body);
+    appendRerollBtn();
+  }
+
+  function appendRerollBtn() {
+    const btn = document.createElement('button');
+    btn.className = 'reroll-btn';
+    btn.textContent = 'もう一回引く 🎲';
+    btn.addEventListener('click', runGacha);
+    resultSection.appendChild(btn);
+  }
+
+  // ===== メニュー一覧レンダリング（食べ物のみ） =====
+  function renderMenuList(data) {
+    const foodCats = data.categories
+      .filter(c => c.kind === 'food')
+      .sort((a, b) => a.order - b.order);
+
+    menuListBody.innerHTML = '';
+
+    for (const cat of foodCats) {
+      const items = data.items.filter(
+        i => i.category === cat.id && i.available !== false
+      );
+      if (items.length === 0) continue;
+
+      const sec = document.createElement('div');
+      sec.className = 'menu-cat-section';
+
+      const lbl = document.createElement('p');
+      lbl.className = 'menu-cat-label';
+      lbl.textContent = cat.label;
+      sec.appendChild(lbl);
+
+      for (const item of items) {
+        const row = document.createElement('div');
+        row.className = 'menu-item';
+        row.innerHTML =
+          `<span>${esc(item.name)}</span>` +
+          `<span class="menu-item-price">${esc(yen(item.price))}</span>`;
+        sec.appendChild(row);
+      }
+      menuListBody.appendChild(sec);
+    }
+  }
+
+  // ===== ガチャ実行 =====
+  async function runGacha() {
+    if (isRunning || !menuData) return;
+    isRunning = true;
+
+    gachaBtn.disabled = true;
+    gachaBtn.classList.remove('is-spinning');
+    // 一フレーム後にクラス追加（再実行時もアニメが動くように）
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        gachaBtn.classList.add('is-spinning');
+      });
+    });
+
+    await new Promise(r => setTimeout(r, 400));
+
+    const pool   = buildPool(menuData);
+    const result = generateOrder(pool, menuData.categories, budget);
+    renderResult(result, menuData.categories);
+    hasResult = true;
+
+    gachaBtn.classList.remove('is-spinning');
+    gachaBtn.disabled = false;
+    isRunning = false;
+  }
+
+  // ===== 予算切り替え =====
+  function setBudget(newBudget) {
+    budget = newBudget;
+
+    segBtns.forEach(btn => {
+      const selected = Number(btn.dataset.budget) === budget;
+      btn.setAttribute('aria-checked', selected ? 'true' : 'false');
+    });
+
+    const label = budget.toLocaleString('ja-JP');
+    gachaBtn.textContent = `${label}円ガチャを引く 🎲`;
+    gachaBtn.setAttribute('aria-label', `${label}円ガチャを引く`);
+
+    if (hasResult && menuData && !isRunning) runGacha();
+  }
+
+  segBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const val = Number(btn.dataset.budget);
+      if (val !== budget) setBudget(val);
+    });
+  });
+
+  gachaBtn.addEventListener('click', runGacha);
+
+  // ===== 初期化 =====
+  async function init() {
+    const data = await loadMenu();
+    if (!data) {
+      resultSection.removeAttribute('hidden');
+      resultSection.innerHTML =
+        '<div class="msg-box is-error">' +
+        'メニューデータの読み込みに失敗しました。<br>' +
+        'ページを再読み込みしてください。' +
+        '</div>';
+      menuListBody.innerHTML =
+        '<p style="font-size:0.82rem;color:#888;padding-top:8px;">読み込みに失敗しました。</p>';
+      return;
+    }
+    menuData = data;
+    renderMenuList(data);
+    gachaBtn.disabled = false;
+  }
+
+  init();
+</script>
+</body>
+</html>
