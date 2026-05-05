@@ -349,6 +349,28 @@
       outline-offset: 3px;
     }
 
+    /* ===== シェアボタン ===== */
+    .share-btn {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      margin-top: 10px;
+      border: none;
+      border-radius: var(--r);
+      background: linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
+      color: #fff;
+      font-family: var(--font-b);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .share-btn:active {
+      opacity: 0.82;
+    }
+
     /* ===== 区切り線 ===== */
     .sep {
       border: none;
@@ -541,6 +563,7 @@
   let budget = 2000;
   let hasResult = false;
   let isRunning = false;
+  let lastResult = null;
 
   // ===== DOM =====
   const gachaBtn      = document.getElementById('gacha-btn');
@@ -757,7 +780,9 @@
     }
 
     resultSection.appendChild(body);
+    lastResult = result;
     appendRerollBtn();
+    appendShareBtn();
   }
 
   function appendRerollBtn() {
@@ -766,6 +791,213 @@
     btn.textContent = 'もう一回引く 🎲';
     btn.addEventListener('click', runGacha);
     resultSection.appendChild(btn);
+  }
+
+  function appendShareBtn() {
+    const btn = document.createElement('button');
+    btn.className = 'share-btn';
+    btn.textContent = 'ストーリーズでシェア 📸';
+    btn.addEventListener('click', handleShare);
+    resultSection.appendChild(btn);
+  }
+
+  // ===== シェア =====
+  async function handleShare() {
+    if (!lastResult || !menuData) return;
+    const canvas = buildShareCanvas(lastResult, menuData.categories, budget);
+    canvas.toBlob(async (blob) => {
+      const file = new File([blob], 'mikadoya-gacha.png', { type: 'image/png' });
+      if (navigator.share) {
+        const canShare = !navigator.canShare || navigator.canShare({ files: [file] });
+        if (canShare) {
+          try {
+            await navigator.share({ files: [file], title: 'ミカドヤ 食べ物ガチャ' });
+            return;
+          } catch (e) {
+            if (e.name === 'AbortError') return;
+          }
+        }
+      }
+      fallbackDownload(canvas);
+    }, 'image/png');
+  }
+
+  function fallbackDownload(canvas) {
+    const a = document.createElement('a');
+    a.download = 'mikadoya-gacha.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  }
+
+  function buildShareCanvas(result, categories, bdg) {
+    const W = 1080;
+    const PAD = 64;
+    const RED = '#c0392b';
+    const RED_DARK = '#8c2820';
+    const INK = '#1a1a1a';
+    const BG = '#f6f0e4';
+    const GREEN = '#5a7a3a';
+    const LINE_C = '#d9cfc2';
+
+    const HEADER_H = 300;
+    const SUMMARY_H = 190;
+    const CAT_H = 62;
+    const ITEM_H = 56;
+    const CAT_GAP = 24;
+    const PROMO_H = 160;
+    const FOOTER_H = 140;
+
+    const foodCats = categories
+      .filter(c => c.kind === 'food')
+      .sort((a, b) => a.order - b.order);
+    const grouped = {};
+    for (const item of result.items) {
+      (grouped[item.category] = grouped[item.category] || []).push(item);
+    }
+    const usedCats = foodCats.filter(c => grouped[c.id]?.length > 0);
+
+    let itemsH = PAD;
+    for (const cat of usedCats) {
+      itemsH += CAT_H + grouped[cat.id].length * ITEM_H + CAT_GAP;
+    }
+    itemsH += PAD;
+
+    const H = Math.max(1920, HEADER_H + SUMMARY_H + itemsH + PROMO_H + FOOTER_H);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // ── Header ──
+    ctx.fillStyle = RED;
+    ctx.fillRect(0, 0, W, HEADER_H);
+
+    // Noren strips
+    const nW = W / 8;
+    for (let i = 0; i < 8; i++) {
+      ctx.fillStyle = i % 2 === 0 ? RED_DARK : RED;
+      ctx.fillRect(i * nW, HEADER_H - 48, nW, 48);
+    }
+
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 88px serif';
+    ctx.fillText('ミカドヤ', W / 2, 130);
+
+    ctx.font = '40px serif';
+    ctx.globalAlpha = 0.88;
+    ctx.fillText('食べ物ガチャ', W / 2, 210);
+    ctx.globalAlpha = 1;
+
+    // ── Summary ──
+    let y = HEADER_H;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, y, W, SUMMARY_H);
+
+    ctx.fillStyle = INK;
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 56px sans-serif';
+    ctx.fillText('合計 ' + yen(result.total), W / 2, y + 76);
+
+    ctx.font = '38px sans-serif';
+    ctx.fillStyle = '#555';
+    ctx.fillText('残り ' + yen(result.remainder), W / 2, y + 130);
+
+    ctx.font = '30px sans-serif';
+    ctx.fillStyle = '#999';
+    ctx.fillText('※ドリンク・お通し代別', W / 2, y + 172);
+
+    y += SUMMARY_H;
+
+    // ── Items ──
+    ctx.fillStyle = BG;
+    ctx.fillRect(0, y, W, itemsH);
+
+    y += PAD;
+
+    for (const cat of usedCats) {
+      // Category label
+      ctx.fillStyle = GREEN;
+      ctx.textAlign = 'left';
+      ctx.font = 'bold 38px serif';
+      ctx.fillText(cat.label, PAD, y + 42);
+
+      ctx.strokeStyle = GREEN;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(PAD, y + 52);
+      ctx.lineTo(W - PAD, y + 52);
+      ctx.stroke();
+
+      y += CAT_H;
+
+      for (const item of grouped[cat.id]) {
+        // Dotted divider
+        ctx.setLineDash([5, 8]);
+        ctx.strokeStyle = LINE_C;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(PAD, y + 2);
+        ctx.lineTo(W - PAD, y + 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Item name (truncate if needed)
+        ctx.fillStyle = INK;
+        ctx.textAlign = 'left';
+        ctx.font = '34px sans-serif';
+        const priceW = ctx.measureText('10,000円').width + 16;
+        let name = item.name;
+        while (ctx.measureText(name).width > W - PAD * 2 - priceW) {
+          name = name.slice(0, -1);
+        }
+        if (name !== item.name) name += '…';
+        ctx.fillText(name, PAD, y + 40);
+
+        // Price
+        ctx.fillStyle = RED;
+        ctx.textAlign = 'right';
+        ctx.font = 'bold 34px sans-serif';
+        ctx.fillText(yen(item.price), W - PAD, y + 40);
+
+        y += ITEM_H;
+      }
+
+      y += CAT_GAP;
+    }
+
+    y += PAD;
+
+    // ── Promo ──
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, y, W, PROMO_H);
+
+    ctx.fillStyle = INK;
+    ctx.textAlign = 'center';
+    ctx.font = '30px sans-serif';
+    ctx.fillText('あなたも引いてみる →', W / 2, y + 64);
+
+    ctx.fillStyle = RED;
+    ctx.font = '700 26px monospace';
+    ctx.fillText('doingkid.github.io/mikadoya-gacha', W / 2, y + 108);
+
+    y += PROMO_H;
+
+    // ── Footer (fills rest) ──
+    ctx.fillStyle = INK;
+    ctx.fillRect(0, y, W, H - y);
+
+    ctx.fillStyle = '#c8bfac';
+    ctx.textAlign = 'center';
+    ctx.font = '30px sans-serif';
+    ctx.fillText('酒場ミカドヤ  静岡県三島市', W / 2, y + 64);
+    ctx.font = '26px sans-serif';
+    ctx.fillStyle = '#8a8070';
+    ctx.fillText('価格は税込。ドリンク・お通し代別。', W / 2, y + 108);
+
+    return canvas;
   }
 
   // ===== メニュー一覧レンダリング（食べ物のみ） =====
