@@ -15,14 +15,9 @@
     { "id": "drink",    "label": "ドリンク",     "order": 8, "kind": "drink" }
   ],
   "items": [
-    { "id": "a01",  "name": "海老チーズフライ（6本）",          "category": "agemono",  "price": 500,  "available": true, "tags": [] },
     { "id": "a02",  "name": "ポテトフライ",                    "category": "agemono",  "price": 500,  "available": true, "tags": [] },
     { "id": "a03",  "name": "鶏から揚げ",                      "category": "agemono",  "price": 600,  "available": true, "tags": [] },
     { "id": "a04",  "name": "フライドチキン（バックリブ）",      "category": "agemono",  "price": 750,  "available": true, "tags": [] },
-    { "id": "a05",  "name": "明太子しそ巻き天ぷら",            "category": "agemono",  "price": 350,  "available": true, "tags": [] },
-
-    { "id": "y01",  "name": "霊山しいたけ バター正油焼き",     "category": "yakimono", "price": 500,  "available": true, "tags": [] },
-    { "id": "y02",  "name": "タコにらギョーザ",                "category": "yakimono", "price": 600,  "available": true, "tags": [] },
     { "id": "y03",  "name": "辛子明太あぶり",                  "category": "yakimono", "price": 600,  "available": true, "tags": [] },
     { "id": "y04",  "name": "アサリ酒むし",                    "category": "yakimono", "price": 600,  "available": true, "tags": [] },
     { "id": "y05",  "name": "アサリレモンバター",              "category": "yakimono", "price": 600,  "available": true, "tags": [] },
