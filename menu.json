@@ -15,7 +15,7 @@
     { "id": "drink",    "label": "ドリンク",     "order": 8, "kind": "drink" }
   ],
   "items": [
-    { "id": "a02",  "name": "ポテトフライ",                    "category": "agemono",  "price": 500,  "available": true, "tags": [] },
+    { "id": "a02",  "name": "ポテトフライ（塩・塩こんぶ・コンソメ）",                    "category": "agemono",  "price": 500,  "available": true, "tags": [] },
     { "id": "a03",  "name": "鶏から揚げ",                      "category": "agemono",  "price": 600,  "available": true, "tags": [] },
     { "id": "a04",  "name": "フライドチキン（バックリブ）",      "category": "agemono",  "price": 750,  "available": true, "tags": [] },
     { "id": "y03",  "name": "辛子明太あぶり",                  "category": "yakimono", "price": 600,  "available": true, "tags": [] },
@@ -25,25 +25,25 @@
     { "id": "y07",  "name": "自家製しそギョーザ",              "category": "yakimono", "price": 600,  "available": true, "tags": [] },
 
     { "id": "k01",  "name": "豚バラ串",                        "category": "kushi",    "price": 200,  "available": true, "tags": [] },
-    { "id": "k02",  "name": "豚バラ玉ねぎ合串",               "category": "kushi",    "price": 200,  "available": true, "tags": [] },
+    { "id": "k02",  "name": "豚ハラミ串",               "category": "kushi",    "price": 200,  "available": true, "tags": [] },
     { "id": "k03",  "name": "とり皮串",                        "category": "kushi",    "price": 150,  "available": true, "tags": [] },
     { "id": "k04",  "name": "ばんじり串",                      "category": "kushi",    "price": 150,  "available": true, "tags": [] },
     { "id": "k05",  "name": "セセリ串",                        "category": "kushi",    "price": 200,  "available": true, "tags": [] },
-    { "id": "k06",  "name": "つくねプレーン",                  "category": "kushi",    "price": 200,  "available": true, "tags": [] },
-    { "id": "k07",  "name": "つくね明太マヨ",                  "category": "kushi",    "price": 250,  "available": true, "tags": [] },
-    { "id": "k08",  "name": "つくねチーズ",                    "category": "kushi",    "price": 250,  "available": true, "tags": [] },
+    { "id": "k06",  "name": "つくねプレーン串",                  "category": "kushi",    "price": 200,  "available": true, "tags": [] },
+    { "id": "k07",  "name": "つくね明太マヨ串",                  "category": "kushi",    "price": 250,  "available": true, "tags": [] },
+    { "id": "k08",  "name": "つくねチーズ串",                    "category": "kushi",    "price": 250,  "available": true, "tags": [] },
 
     { "id": "s03",  "name": "赤貝刺身",                        "category": "sengyo",   "price": 800,  "available": true, "tags": [] },
-    { "id": "s04",  "name": "平貝（たいらぎかい）刺身",       "category": "sengyo",   "price": 800,  "available": true, "tags": [] },
-    { "id": "s05",  "name": "梅しめサバ",                      "category": "sengyo",   "price": 500,  "available": true, "tags": [] },
-    { "id": "s06",  "name": "わさびしめサバ",                  "category": "sengyo",   "price": 600,  "available": true, "tags": [] },
+    { "id": "s04",  "name": "平貝（たいらぎかい）刺身（コリコリホタテ）",       "category": "sengyo",   "price": 800,  "available": true, "tags": [] },
+    { "id": "s05",  "name": "梅水晶",                      "category": "sengyo",   "price": 500,  "available": true, "tags": [] },
+    { "id": "s06",  "name": "あぶりしめサバ",                  "category": "sengyo",   "price": 600,  "available": true, "tags": [] },
     { "id": "s07",  "name": "ガリしめサバ",                     "category": "sengyo",   "price": 400,  "available": true, "tags": [] },
 
     { "id": "i01",  "name": "わさび枝豆",                      "category": "ippin",    "price": 300,  "available": true, "tags": [] },
     { "id": "i02",  "name": "馬刺し",                          "category": "ippin",    "price": 800,  "available": true, "tags": [] },
     { "id": "i06",  "name": "馬肉ネギ塩ユッケ",               "category": "ippin",    "price": 800,  "available": true, "tags": [] },
-    { "id": "i03",  "name": "国産鶏ムネ肉タタキ",             "category": "ippin",    "price": 800,  "available": true, "tags": [] },
-    { "id": "i04",  "name": "ミカドおでん 味噌みだれ盛り",    "category": "ippin",    "price": 600,  "available": true, "tags": [] },
+    { "id": "i03",  "name": "国産とりムネタタキ",             "category": "ippin",    "price": 800,  "available": true, "tags": [] },
+    { "id": "i04",  "name": "ミカド味噌おでん盛り",    "category": "ippin",    "price": 600,  "available": true, "tags": [] },
     { "id": "i05",  "name": "おでん単品（大根・たこ・こんにゃく・ちくわ）", "category": "ippin", "price": 150, "available": true, "tags": [] },
 
     { "id": "sh01", "name": "カレーライス",                    "category": "shime",    "price": 600,  "available": true, "tags": [] },
@@ -51,7 +51,8 @@
     { "id": "sh03", "name": "焼きそば",                        "category": "shime",    "price": 600,  "available": true, "tags": [] },
     { "id": "sh04", "name": "焼きうどん",                      "category": "shime",    "price": 600,  "available": true, "tags": [] },
     { "id": "sh05", "name": "ピザトースト",                    "category": "shime",    "price": 500,  "available": true, "tags": [] },
-    { "id": "sh06", "name": "マチュピチュおにぎり",            "category": "shime",    "price": 300,  "available": true, "tags": [] },
+    { "id": "sh06", "name": "マチュピチュおにぎり（たかな、しゃけ、たぬき）",            "category": "shime",    "price": 300,  "available": true, "tags": [] },
+    { "id": "sh07", "name": "焼きカレー",                      "category": "shime",    "price": 700,  "available": true, "tags": [] },
 
     { "id": "de01", "name": "自家製パフェ（チョコ・黒みつきなこ）", "category": "dessert", "price": 500, "available": true, "tags": [] },
 
