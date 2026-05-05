@@ -27,7 +27,7 @@
     { "id": "k01",  "name": "豚バラ串",                        "category": "kushi",    "price": 200,  "available": true, "tags": [] },
     { "id": "k02",  "name": "豚ハラミ串",               "category": "kushi",    "price": 200,  "available": true, "tags": [] },
     { "id": "k03",  "name": "とり皮串",                        "category": "kushi",    "price": 150,  "available": true, "tags": [] },
-    { "id": "k04",  "name": "ばんじり串",                      "category": "kushi",    "price": 150,  "available": true, "tags": [] },
+    { "id": "k04",  "name": "ぼんじり串",                      "category": "kushi",    "price": 150,  "available": true, "tags": [] },
     { "id": "k05",  "name": "セセリ串",                        "category": "kushi",    "price": 200,  "available": true, "tags": [] },
     { "id": "k06",  "name": "つくねプレーン串",                  "category": "kushi",    "price": 200,  "available": true, "tags": [] },
     { "id": "k07",  "name": "つくね明太マヨ串",                  "category": "kushi",    "price": 250,  "available": true, "tags": [] },
