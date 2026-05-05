@@ -38,8 +38,6 @@
     { "id": "k07",  "name": "つくね明太マヨ",                  "category": "kushi",    "price": 250,  "available": true, "tags": [] },
     { "id": "k08",  "name": "つくねチーズ",                    "category": "kushi",    "price": 250,  "available": true, "tags": [] },
 
-    { "id": "s01",  "name": "アオダイにぎじめ刺し",            "category": "sengyo",   "price": 700,  "available": true, "tags": ["daily"] },
-    { "id": "s02",  "name": "本マグロ刺し・漬け刺し盛り",     "category": "sengyo",   "price": 1200, "available": true, "tags": ["daily"] },
     { "id": "s03",  "name": "赤貝刺身",                        "category": "sengyo",   "price": 800,  "available": true, "tags": [] },
     { "id": "s04",  "name": "平貝（たいらぎかい）刺身",       "category": "sengyo",   "price": 800,  "available": true, "tags": [] },
     { "id": "s05",  "name": "梅しめサバ",                      "category": "sengyo",   "price": 500,  "available": true, "tags": [] },
