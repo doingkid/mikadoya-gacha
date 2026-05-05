@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ミカドヤ 食べ物ガチャ</title>
+  <title>ミカドガチャ</title>
   <style>
     /* ===== CSS 変数 ===== */
     :root {
@@ -484,8 +484,8 @@
          alt="酒場ミカドヤ 看板"
          width="72"
          height="112">
-    <h1 class="header-title">食べ物ガチャ</h1>
-    <p class="header-sub">予算内の食べ物の組み合わせをランダムに提案</p>
+    <h1 class="header-title">ミカドガチャ</h1>
+    <p class="header-sub">予算きめて、あとはおまかせ！</p>
     <div class="header-noren" aria-hidden="true">
       <div class="noren-strip"></div>
       <div class="noren-strip"></div>
@@ -725,7 +725,7 @@
 
     if (result.error === 'OVER_BUDGET') {
       resultSection.innerHTML =
-        `<div class="msg-box is-error">${yen(budget)}に収まる食べ物の組み合わせがありません。</div>`;
+        `<div class="msg-box is-error">${yen(budget)}に収まるメニューがありません。</div>`;
       appendRerollBtn();
       return;
     }
@@ -811,7 +811,7 @@
         const canShare = !navigator.canShare || navigator.canShare({ files: [file] });
         if (canShare) {
           try {
-            await navigator.share({ files: [file], title: 'ミカドヤ 食べ物ガチャ' });
+            await navigator.share({ files: [file], title: 'ミカドガチャ' });
             return;
           } catch (e) {
             if (e.name === 'AbortError') return;
@@ -887,7 +887,7 @@
 
     ctx.font = '40px serif';
     ctx.globalAlpha = 0.88;
-    ctx.fillText('食べ物ガチャ', W / 2, 210);
+    ctx.fillText('ミカドガチャ', W / 2, 210);
     ctx.globalAlpha = 1;
 
     // ── Summary ──
