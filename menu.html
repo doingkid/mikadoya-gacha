@@ -220,14 +220,13 @@
   }
 
   async function loadMenu() {
-    for (const src of ['./menu.json', './menu.sample.json']) {
-      try {
-        const res = await fetch(src);
-        if (!res.ok) continue;
+    try {
+      const res = await fetch('./menu.json');
+      if (res.ok) {
         const data = await res.json();
         if (data && Array.isArray(data.categories) && Array.isArray(data.items)) return data;
-      } catch (_) {}
-    }
+      }
+    } catch (_) {}
     return null;
   }
 

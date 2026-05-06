@@ -69,7 +69,6 @@ mikadoya-gacha/
 ├── index.html        # ガチャ画面（HTML + CSS + JS を1ファイルに内包）
 ├── menu.html         # メニュー一覧（食べ物・ドリンク全品、kcal付き）
 ├── menu.json         # 本番メニューデータ
-├── menu.sample.json  # 動作確認用ダミー（menu.json がない場合の自動フォールバック）
 ├── kanban.png        # 看板画像（背景透過PNG）
 └── README.md
 ```

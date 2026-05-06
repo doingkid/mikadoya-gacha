@@ -532,19 +532,15 @@
 
   // ===== メニュー読み込み =====
   async function loadMenu() {
-    const sources = ['./menu.json', './menu.sample.json'];
-    for (const src of sources) {
-      try {
-        const res = await fetch(src);
-        if (!res.ok) continue;
+    try {
+      const res = await fetch('./menu.json');
+      if (res.ok) {
         const data = await res.json();
         if (data && Array.isArray(data.categories) && Array.isArray(data.items)) {
           return data;
         }
-      } catch (_) {
-        // 次のフォールバックへ
       }
-    }
+    } catch (_) {}
     return null;
   }
 
