@@ -729,7 +729,7 @@
     const btn = document.createElement('button');
     btn.className = 'reroll-btn';
     btn.textContent = 'もう一回引く 🎲';
-    btn.addEventListener('click', runGacha);
+    btn.addEventListener('click', () => runGacha(null));
     resultSection.appendChild(btn);
   }
 
