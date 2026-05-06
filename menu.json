@@ -47,7 +47,7 @@
     { "id": "sh03", "name": "焼きそば",                                           "category": "shime",    "price": 600,  "available": true, "tags": [], "kcal": 500, "speed": "slow"   },
     { "id": "sh04", "name": "焼きうどん",                                         "category": "shime",    "price": 600,  "available": true, "tags": [], "kcal": 490, "speed": "slow"   },
     { "id": "sh05", "name": "ピザトースト",                                       "category": "shime",    "price": 500,  "available": true, "tags": [], "kcal": 380, "speed": "medium" },
-    { "id": "sh06", "name": "マチュピチュおにぎり（たかな、しゃけ、たぬき）",    "category": "shime",    "price": 300,  "available": true, "tags": [], "kcal": 280, "speed": "fast"   },
+    { "id": "sh06", "name": "マチュピチュおにぎり（たかな、しゃけ、たぬき）",    "category": "shime",    "price": 300,  "available": true, "tags": [], "kcal": 450, "speed": "fast"   },
     { "id": "sh07", "name": "焼きカレー",                                         "category": "shime",    "price": 700,  "available": true, "tags": [], "kcal": 680, "speed": "slow"   },
     { "id": "de01", "name": "自家製パフェ（チョコ・黒みつきなこ）",              "category": "dessert",  "price": 500,  "available": true, "tags": [], "kcal": 380, "speed": "medium" },
 
