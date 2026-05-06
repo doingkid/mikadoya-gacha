@@ -60,22 +60,27 @@
     }
 
     .header-inner {
-      padding: 24px 16px 0;
-      text-align: center;
+      padding: 20px 16px 0;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
 
     .header-kanban {
       display: block;
-      width: 72px;
-      height: auto;
-      margin: 0 auto 14px;
+      width: auto;
+      height: 52px;
       object-fit: contain;
-      filter: drop-shadow(2px 6px 12px rgba(0,0,0,0.5));
+      filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.45));
+      flex-shrink: 0;
     }
 
     .header-title {
       font-family: var(--font-h);
-      font-size: clamp(1.5rem, 5.5vw, 1.9rem);
+      font-size: clamp(1.4rem, 5.5vw, 1.8rem);
       letter-spacing: 0.15em;
       line-height: 1.2;
       text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
@@ -84,7 +89,7 @@
     .header-sub {
       font-size: 0.72rem;
       opacity: 0.75;
-      margin-top: 6px;
+      margin-top: 5px;
       letter-spacing: 0.05em;
     }
 
@@ -538,13 +543,17 @@
 <!-- ヘッダー -->
 <header class="header">
   <div class="header-inner">
-    <img class="header-kanban"
-         src="./kanban.png"
-         alt="酒場ミカドヤ 看板"
-         width="72"
-         height="112">
-    <h1 class="header-title">ミカドガチャ</h1>
-    <p class="header-sub">今夜のつまみ、ガチャが選ぶ。</p>
+    <div class="header-top">
+      <img class="header-kanban"
+           src="./kanban.png"
+           alt="酒場ミカドヤ 看板"
+           width="72"
+           height="112">
+      <div>
+        <h1 class="header-title">ミカドガチャ</h1>
+        <p class="header-sub">今夜のつまみ、ガチャが選ぶ。</p>
+      </div>
+    </div>
     <div class="header-noren" aria-hidden="true">
       <div class="noren-strip"></div>
       <div class="noren-strip"></div>
