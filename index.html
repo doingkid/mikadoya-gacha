@@ -112,48 +112,13 @@
       border-radius: 0 0 14px 14px;
     }
 
-    /* ===== コントロールカード（予算＋フィルター） ===== */
-    .control-card {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 16px;
-    }
-
-    .budget-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .seg-btn {
-      flex: 1;
-      padding: 11px 8px;
-      font-family: var(--font-b);
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #aaa;
-      background: var(--bg);
-      border: 1.5px solid var(--line);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .seg-btn[aria-checked="true"] {
-      background: var(--red);
-      color: #fff;
-      border-color: var(--red);
-    }
-
-    .seg-btn:focus-visible {
-      outline: 3px solid var(--brown);
-      outline-offset: -3px;
-    }
-
     /* ===== ガチャボタン ===== */
-    .gacha-section { margin-bottom: 20px; }
+    .gacha-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
 
     .gacha-btn {
       display: block;
@@ -386,9 +351,7 @@
     .filter-row {
       display: flex;
       gap: 8px;
-      margin-top: 10px;
-      padding-top: 12px;
-      border-top: 1px solid var(--line);
+      margin-top: 16px;
     }
 
     .filter-chip {
@@ -477,37 +440,19 @@
 <main class="main">
   <div class="main-inner">
 
-    <!-- コントロール（予算＋フィルター） -->
-    <div class="control-card">
-      <div class="budget-row" role="radiogroup" aria-label="予算選択">
-        <button class="seg-btn"
-                role="radio"
-                aria-checked="true"
-                data-budget="2000">2,000円</button>
-        <button class="seg-btn"
-                role="radio"
-                aria-checked="false"
-                data-budget="3000">3,000円</button>
-      </div>
-      <div class="filter-row">
-        <label class="filter-chip">
-          <input type="checkbox" id="filter-fast">
-          <span>⚡ すぐ出る</span>
-        </label>
-        <label class="filter-chip">
-          <input type="checkbox" id="filter-healthy">
-          <span>🥗 ヘルシーメニュー</span>
-        </label>
-      </div>
-    </div>
-
     <!-- ガチャボタン -->
     <section class="gacha-section">
       <button class="gacha-btn"
-              id="gacha-btn"
+              data-budget="2000"
               aria-label="2000円ガチャを引く"
               disabled>
-        2,000円ガチャを引く 🎲
+        2,000円で引く 🎲
+      </button>
+      <button class="gacha-btn"
+              data-budget="3000"
+              aria-label="3000円ガチャを引く"
+              disabled>
+        3,000円で引く 🎲
       </button>
     </section>
 
@@ -518,6 +463,18 @@
              aria-atomic="true"
              hidden>
     </section>
+
+    <!-- フィルター -->
+    <div class="filter-row">
+      <label class="filter-chip">
+        <input type="checkbox" id="filter-fast">
+        <span>⚡ すぐ出る</span>
+      </label>
+      <label class="filter-chip">
+        <input type="checkbox" id="filter-healthy">
+        <span>🥗 ヘルシーメニュー</span>
+      </label>
+    </div>
 
   </div>
 </main>
@@ -544,9 +501,8 @@
   const HEALTHY_KCAL = 300;
 
   // ===== DOM =====
-  const gachaBtn      = document.getElementById('gacha-btn');
+  const gachaBtns     = document.querySelectorAll('.gacha-btn');
   const resultSection = document.getElementById('result-section');
-  const segBtns       = document.querySelectorAll('.seg-btn');
 
   // ===== ユーティリティ =====
 
@@ -985,18 +941,18 @@
   }
 
   // ===== ガチャ実行 =====
-  async function runGacha() {
+  async function runGacha(clickedBtn) {
     if (isRunning || !menuData) return;
     isRunning = true;
 
-    gachaBtn.disabled = true;
-    gachaBtn.classList.remove('is-spinning');
-    // 一フレーム後にクラス追加（再実行時もアニメが動くように）
-    requestAnimationFrame(() => {
+    gachaBtns.forEach(b => b.disabled = true);
+
+    if (clickedBtn) {
+      clickedBtn.classList.remove('is-spinning');
       requestAnimationFrame(() => {
-        gachaBtn.classList.add('is-spinning');
+        requestAnimationFrame(() => clickedBtn.classList.add('is-spinning'));
       });
-    });
+    }
 
     await new Promise(r => setTimeout(r, 400));
 
@@ -1005,44 +961,26 @@
     renderResult(result, menuData.categories);
     hasResult = true;
 
-    gachaBtn.classList.remove('is-spinning');
-    gachaBtn.disabled = false;
+    if (clickedBtn) clickedBtn.classList.remove('is-spinning');
+    gachaBtns.forEach(b => b.disabled = false);
     isRunning = false;
   }
 
-  // ===== 予算切り替え =====
-  function setBudget(newBudget) {
-    budget = newBudget;
-
-    segBtns.forEach(btn => {
-      const selected = Number(btn.dataset.budget) === budget;
-      btn.setAttribute('aria-checked', selected ? 'true' : 'false');
-    });
-
-    const label = budget.toLocaleString('ja-JP');
-    gachaBtn.textContent = `${label}円ガチャを引く 🎲`;
-    gachaBtn.setAttribute('aria-label', `${label}円ガチャを引く`);
-
-    if (hasResult && menuData && !isRunning) runGacha();
-  }
-
-  segBtns.forEach(btn => {
+  gachaBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      const val = Number(btn.dataset.budget);
-      if (val !== budget) setBudget(val);
+      budget = Number(btn.dataset.budget);
+      runGacha(btn);
     });
   });
 
-  gachaBtn.addEventListener('click', runGacha);
-
   document.getElementById('filter-fast').addEventListener('change', e => {
     filterFast = e.target.checked;
-    if (hasResult && menuData && !isRunning) runGacha();
+    if (hasResult && menuData && !isRunning) runGacha(null);
   });
 
   document.getElementById('filter-healthy').addEventListener('change', e => {
     filterHealthy = e.target.checked;
-    if (hasResult && menuData && !isRunning) runGacha();
+    if (hasResult && menuData && !isRunning) runGacha(null);
   });
 
   // ===== 初期化 =====
@@ -1058,7 +996,7 @@
       return;
     }
     menuData = data;
-    gachaBtn.disabled = false;
+    gachaBtns.forEach(b => b.disabled = false);
   }
 
   init();
