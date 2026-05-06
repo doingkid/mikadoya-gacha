@@ -382,101 +382,6 @@
       opacity: 0.82;
     }
 
-    /* ===== 区切り線 ===== */
-    .sep {
-      border: none;
-      border-top: 1px solid var(--line);
-      margin: 28px 0;
-    }
-
-    /* ===== 食べ物メニュー一覧（折りたたみ） ===== */
-    .menu-details {
-      border: 1px solid var(--line);
-      border-radius: var(--r);
-      background: var(--card);
-      overflow: hidden;
-    }
-
-    .menu-details > summary {
-      list-style: none;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 16px;
-      cursor: pointer;
-      font-family: var(--font-h);
-      font-size: 0.9rem;
-      color: var(--brown);
-      letter-spacing: 0.08em;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-
-    .menu-details > summary::-webkit-details-marker { display: none; }
-
-    .menu-details > summary::after {
-      content: '▸';
-      font-size: 0.8rem;
-      transition: transform 0.2s;
-      flex-shrink: 0;
-      margin-left: 8px;
-    }
-
-    .menu-details[open] > summary::after {
-      transform: rotate(90deg);
-    }
-
-    .menu-details > summary:focus-visible {
-      outline: 2px solid var(--brown);
-      outline-offset: -2px;
-    }
-
-    .menu-list-body {
-      padding: 4px 16px 16px;
-    }
-
-    .menu-cat-section { margin-top: 14px; }
-
-    .menu-cat-label {
-      font-family: var(--font-h);
-      font-size: 0.8rem;
-      color: var(--green);
-      border-bottom: 1px solid var(--green);
-      padding-bottom: 2px;
-      margin-bottom: 6px;
-      letter-spacing: 0.1em;
-    }
-
-    .menu-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 5px 0;
-      font-size: 0.82rem;
-      border-bottom: 1px dotted var(--line);
-    }
-
-    .menu-item:last-child { border-bottom: none; }
-
-    .menu-item-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-      margin-left: 8px;
-      flex-shrink: 0;
-    }
-
-    .menu-item-price {
-      color: var(--red);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .menu-item-kcal {
-      font-size: 0.7rem;
-      color: #aaa;
-    }
-
     /* ===== フィルターチップ（コントロールカード内） ===== */
     .filter-row {
       display: flex;
@@ -614,16 +519,6 @@
              hidden>
     </section>
 
-    <hr class="sep">
-
-    <!-- 食べ物メニュー一覧（折りたたみ） -->
-    <details class="menu-details" id="menu-details">
-      <summary>食べ物メニュー一覧</summary>
-      <div class="menu-list-body" id="menu-list-body">
-        <p style="font-size:0.82rem;color:#888;padding-top:8px;">読み込み中…</p>
-      </div>
-    </details>
-
   </div>
 </main>
 
@@ -631,6 +526,7 @@
   <div class="footer-inner">
     <p>※価格は税込。ドリンク・お通し（チャージ）代は別途。</p>
     <p>本サービスはファンによる非公式サイトです。</p>
+    <a href="./menu.html" style="display:inline-block;margin-top:8px;color:#c8bfac;font-size:0.75rem;text-underline-offset:3px;">メニューを見る →</a>
   </div>
 </footer>
 
@@ -650,7 +546,6 @@
   // ===== DOM =====
   const gachaBtn      = document.getElementById('gacha-btn');
   const resultSection = document.getElementById('result-section');
-  const menuListBody  = document.getElementById('menu-list-body');
   const segBtns       = document.querySelectorAll('.seg-btn');
 
   // ===== ユーティリティ =====
@@ -1089,43 +984,6 @@
     return canvas;
   }
 
-  // ===== メニュー一覧レンダリング（食べ物のみ） =====
-  function renderMenuList(data) {
-    const foodCats = data.categories
-      .filter(c => c.kind === 'food')
-      .sort((a, b) => a.order - b.order);
-
-    menuListBody.innerHTML = '';
-
-    for (const cat of foodCats) {
-      const items = data.items.filter(
-        i => i.category === cat.id && i.available !== false
-      );
-      if (items.length === 0) continue;
-
-      const sec = document.createElement('div');
-      sec.className = 'menu-cat-section';
-
-      const lbl = document.createElement('p');
-      lbl.className = 'menu-cat-label';
-      lbl.textContent = cat.label;
-      sec.appendChild(lbl);
-
-      for (const item of items) {
-        const row = document.createElement('div');
-        row.className = 'menu-item';
-        const kcalMeta = item.kcal != null
-          ? `<span class="menu-item-kcal">約${item.kcal}kcal</span>`
-          : '';
-        row.innerHTML =
-          `<span>${esc(item.name)}</span>` +
-          `<span class="menu-item-right">${kcalMeta}<span class="menu-item-price">${esc(yen(item.price))}</span></span>`;
-        sec.appendChild(row);
-      }
-      menuListBody.appendChild(sec);
-    }
-  }
-
   // ===== ガチャ実行 =====
   async function runGacha() {
     if (isRunning || !menuData) return;
@@ -1197,12 +1055,9 @@
         'メニューデータの読み込みに失敗しました。<br>' +
         'ページを再読み込みしてください。' +
         '</div>';
-      menuListBody.innerHTML =
-        '<p style="font-size:0.82rem;color:#888;padding-top:8px;">読み込みに失敗しました。</p>';
       return;
     }
     menuData = data;
-    renderMenuList(data);
     gachaBtn.disabled = false;
   }
 
