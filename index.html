@@ -447,11 +447,67 @@
 
     .menu-item:last-child { border-bottom: none; }
 
+    .menu-item-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      margin-left: 8px;
+      flex-shrink: 0;
+    }
+
     .menu-item-price {
       color: var(--red);
       font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-      margin-left: 8px;
+    }
+
+    .menu-item-kcal {
+      font-size: 0.7rem;
+      color: #aaa;
+    }
+
+    /* ===== フィルター ===== */
+    .filter-section {
+      margin-bottom: 16px;
+    }
+
+    .filter-checks {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .filter-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 14px;
+      border: 1.5px solid var(--line);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--brown);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .filter-check:has(input:checked) {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+
+    .filter-check input[type="checkbox"] {
+      display: none;
+    }
+
+    /* ===== 結果内kcal ===== */
+    .item-kcal {
+      display: block;
+      font-size: 0.72rem;
+      color: #999;
+      margin-top: 2px;
     }
 
     /* ===== フッター ===== */
@@ -517,6 +573,21 @@
       </div>
     </section>
 
+    <!-- フィルター -->
+    <section class="filter-section">
+      <span class="section-label">絞り込み</span>
+      <div class="filter-checks">
+        <label class="filter-check">
+          <input type="checkbox" id="filter-fast">
+          <span>⚡ すぐ出る</span>
+        </label>
+        <label class="filter-check">
+          <input type="checkbox" id="filter-healthy">
+          <span>🥗 ヘルシーメニュー</span>
+        </label>
+      </div>
+    </section>
+
     <!-- ガチャボタン -->
     <section class="gacha-section">
       <button class="gacha-btn"
@@ -564,6 +635,9 @@
   let hasResult = false;
   let isRunning = false;
   let lastResult = null;
+  let filterFast = false;
+  let filterHealthy = false;
+  const HEALTHY_KCAL = 300;
 
   // ===== DOM =====
   const gachaBtn      = document.getElementById('gacha-btn');
@@ -614,15 +688,19 @@
   }
 
   // ===== ガチャ対象プール構築（kind:"food" の category のみ） =====
-  function buildPool(data) {
+  function buildPool(data, fast, healthy) {
     const foodIds = new Set(
       data.categories
         .filter(c => c.kind === 'food')
         .map(c => c.id)
     );
-    return data.items.filter(item =>
-      item.available !== false && foodIds.has(item.category)
-    );
+    return data.items.filter(item => {
+      if (item.available === false) return false;
+      if (!foodIds.has(item.category)) return false;
+      if (fast    && item.speed !== 'fast') return false;
+      if (healthy && (item.kcal == null || item.kcal > HEALTHY_KCAL)) return false;
+      return true;
+    });
   }
 
   // ===== ガチャアルゴリズム（§6.2） =====
@@ -771,8 +849,11 @@
       for (const item of grouped[cat.id]) {
         const row = document.createElement('div');
         row.className = 'item-row';
+        const kcalHtml = item.kcal != null
+          ? `<small class="item-kcal">約${item.kcal}kcal</small>`
+          : '';
         row.innerHTML =
-          `<span class="item-name">${esc(item.name)}</span>` +
+          `<span class="item-name">${esc(item.name)}${kcalHtml}</span>` +
           `<span class="item-price">${esc(yen(item.price))}</span>`;
         group.appendChild(row);
       }
@@ -1025,9 +1106,12 @@
       for (const item of items) {
         const row = document.createElement('div');
         row.className = 'menu-item';
+        const kcalMeta = item.kcal != null
+          ? `<span class="menu-item-kcal">約${item.kcal}kcal</span>`
+          : '';
         row.innerHTML =
           `<span>${esc(item.name)}</span>` +
-          `<span class="menu-item-price">${esc(yen(item.price))}</span>`;
+          `<span class="menu-item-right">${kcalMeta}<span class="menu-item-price">${esc(yen(item.price))}</span></span>`;
         sec.appendChild(row);
       }
       menuListBody.appendChild(sec);
@@ -1050,7 +1134,7 @@
 
     await new Promise(r => setTimeout(r, 400));
 
-    const pool   = buildPool(menuData);
+    const pool   = buildPool(menuData, filterFast, filterHealthy);
     const result = generateOrder(pool, menuData.categories, budget);
     renderResult(result, menuData.categories);
     hasResult = true;
@@ -1084,6 +1168,16 @@
   });
 
   gachaBtn.addEventListener('click', runGacha);
+
+  document.getElementById('filter-fast').addEventListener('change', e => {
+    filterFast = e.target.checked;
+    if (hasResult && menuData && !isRunning) runGacha();
+  });
+
+  document.getElementById('filter-healthy').addEventListener('change', e => {
+    filterHealthy = e.target.checked;
+    if (hasResult && menuData && !isRunning) runGacha();
+  });
 
   // ===== 初期化 =====
   async function init() {
