@@ -143,7 +143,8 @@
       box-shadow: 0 1px 0 var(--red-dark);
     }
 
-    .gacha-btn:disabled {
+    .gacha-btn:disabled,
+    .gacha-btn.is-running {
       background: #b0a090;
       box-shadow: 0 5px 0 #887060;
       cursor: not-allowed;
@@ -949,9 +950,8 @@
     if (isRunning || !menuData) return;
     isRunning = true;
 
-    gachaBtns.forEach(b => b.disabled = true);
-
     if (clickedBtn) {
+      clickedBtn.classList.add('is-running');
       clickedBtn.classList.remove('is-spinning');
       requestAnimationFrame(() => {
         requestAnimationFrame(() => clickedBtn.classList.add('is-spinning'));
@@ -965,8 +965,10 @@
     renderResult(result, menuData.categories);
     hasResult = true;
 
-    if (clickedBtn) clickedBtn.classList.remove('is-spinning');
-    gachaBtns.forEach(b => b.disabled = false);
+    if (clickedBtn) {
+      clickedBtn.classList.remove('is-spinning');
+      clickedBtn.classList.remove('is-running');
+    }
     isRunning = false;
   }
 
