@@ -213,6 +213,12 @@
       color: var(--brown);
     }
 
+    .result-kcal {
+      font-size: 0.78rem;
+      color: #999;
+      width: 100%;
+    }
+
     .result-note {
       font-size: 0.72rem;
       color: #888;
@@ -672,13 +678,15 @@
       return;
     }
 
-    // サマリー（合計・残額）
+    // サマリー（合計・残額・合計kcal）
+    const totalKcal = result.items.reduce((s, i) => s + (i.kcal ?? 0), 0);
     const summary = document.createElement('div');
     summary.className = 'result-summary result-fade';
     summary.innerHTML =
       `<span class="result-label">ガチャ結果</span>` +
       `<span class="result-total">合計 ${esc(yen(result.total))}</span>` +
-      `<span class="result-remainder">残り ${esc(yen(result.remainder))}</span>`;
+      `<span class="result-remainder">残り ${esc(yen(result.remainder))}</span>` +
+      `<span class="result-kcal">約${totalKcal}kcal</span>`;
     resultSection.appendChild(summary);
 
     const note = document.createElement('p');
